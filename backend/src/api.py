@@ -141,4 +141,32 @@ async def process_photo(photo: UploadFile = File(...), class_name: str = Form(..
 @app.get("/api/classes")
 async def get_classes():
     students = load_students()
-    return list(set(data["class_name"] for data in students.values())) 
+    return list(set(data["class_name"] for data in students.values()))
+
+@app.post("/api/reset")
+async def reset_all():
+    """Reset all data: delete all photos and students.json"""
+    try:
+        # Delete all files in profile_photos directory
+        for file in os.listdir(PROFILE_PHOTOS_DIR):
+            file_path = os.path.join(PROFILE_PHOTOS_DIR, file)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+        
+        # Delete all files in class_photos directory
+        for class_dir in os.listdir(CLASS_PHOTOS_DIR):
+            class_path = os.path.join(CLASS_PHOTOS_DIR, class_dir)
+            if os.path.isdir(class_path):
+                for file in os.listdir(class_path):
+                    file_path = os.path.join(class_path, file)
+                    if os.path.isfile(file_path):
+                        os.remove(file_path)
+                os.rmdir(class_path)
+        
+        # Delete students.json if exists
+        if os.path.exists(STUDENTS_FILE):
+            os.remove(STUDENTS_FILE)
+        
+        return {"message": "All data reset successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e)) 

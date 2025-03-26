@@ -13,8 +13,17 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
-import { CloudUpload, PersonAdd, PhotoCamera } from "@mui/icons-material";
+import {
+  CloudUpload,
+  PersonAdd,
+  PhotoCamera,
+  Delete,
+} from "@mui/icons-material";
 import axios from "axios";
 
 interface Student {
@@ -35,6 +44,7 @@ function App() {
   const [resultPhoto, setResultPhoto] = useState<string | null>(null);
   const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
   const [showProfilePhoto, setShowProfilePhoto] = useState(false);
+  const [openResetDialog, setOpenResetDialog] = useState(false);
 
   useEffect(() => {
     fetchClasses();
@@ -94,12 +104,66 @@ function App() {
     }
   };
 
+  const handleReset = async () => {
+    try {
+      await axios.post("http://localhost:8000/api/reset");
+      setClasses([]);
+      setNewStudent({ name: "", class_name: "", blur_face: true });
+      setSelectedClass("");
+      setSelectedPhoto(null);
+      setResultPhoto(null);
+      setProfilePhotoUrl(null);
+      setShowProfilePhoto(false);
+      setOpenResetDialog(false);
+    } catch (error) {
+      console.error("Error resetting data:", error);
+    }
+  };
+
   return (
     <Container maxWidth="lg">
       <Box sx={{ my: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Face Recognition and Blurring System
-        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 4,
+          }}
+        >
+          <Typography variant="h5" component="h1" fontWeight="bold">
+            Face Recognition and Blurring System
+          </Typography>
+          <Button
+            variant="outlined"
+            color="error"
+            startIcon={<Delete />}
+            onClick={() => setOpenResetDialog(true)}
+          >
+            Reset All Data
+          </Button>
+        </Box>
+
+        {/* Reset Confirmation Dialog */}
+        <Dialog
+          open={openResetDialog}
+          onClose={() => setOpenResetDialog(false)}
+        >
+          <DialogTitle>Reset All Data</DialogTitle>
+          <DialogContent>
+            <Typography>
+              This action will delete all student photos, class photos, and
+              student data. This action cannot be undone. Are you sure you want
+              to continue?
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenResetDialog(false)}>Cancel</Button>
+            <Button onClick={handleReset} color="error" variant="contained">
+              Reset All Data
+            </Button>
+          </DialogActions>
+        </Dialog>
 
         {/* Student Addition and Profile */}
         <Box
