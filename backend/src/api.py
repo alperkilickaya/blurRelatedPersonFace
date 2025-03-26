@@ -12,7 +12,7 @@ import json
 
 app = FastAPI()
 
-# CORS ayarları
+# CORS settings
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000", "http://localhost:5173"],
@@ -21,10 +21,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Statik dosyaları servis et
+# Serve static files
 app.mount("/api/photos", StaticFiles(directory="data"), name="photos")
 
-# Veri modelleri
+# Data models
 class Student(BaseModel):
     name: str
     class_name: str
@@ -34,7 +34,7 @@ class ClassPhoto(BaseModel):
     class_name: str
     blur_students: List[str]
 
-# Veri depolama
+# Data storage
 STUDENTS_FILE = "data/students.json"
 PROFILE_PHOTOS_DIR = "data/profile_photos"
 CLASS_PHOTOS_DIR = "data/class_photos"
@@ -42,33 +42,35 @@ os.makedirs(PROFILE_PHOTOS_DIR, exist_ok=True)
 os.makedirs(CLASS_PHOTOS_DIR, exist_ok=True)
 
 def get_class_photo_dir(class_name: str) -> str:
-    """Sınıf için fotoğraf klasörünü oluşturur ve yolunu döndürür."""
+    """Creates and returns the photo directory for a class."""
     class_dir = os.path.join(CLASS_PHOTOS_DIR, class_name)
     os.makedirs(class_dir, exist_ok=True)
     return class_dir
 
 def load_students():
+    """Load student data from JSON file."""
     if os.path.exists(STUDENTS_FILE):
         with open(STUDENTS_FILE, 'r') as f:
             return json.load(f)
     return {}
 
 def save_students(students):
+    """Save student data to JSON file."""
     with open(STUDENTS_FILE, 'w') as f:
         json.dump(students, f)
 
 # API endpoints
 @app.post("/api/students")
 async def add_student(student_data: str = Form(...), photo: UploadFile = File(...)):
-    # JSON string'i parse et
+    # Parse JSON string
     student = json.loads(student_data)
     
-    # Fotoğrafı kaydet
+    # Save photo
     photo_path = f"data/profile_photos/{student['name']}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg"
     with open(photo_path, "wb") as buffer:
         shutil.copyfileobj(photo.file, buffer)
     
-    # Öğrenci bilgilerini kaydet
+    # Save student information
     students = load_students()
     students[student['name']] = {
         "class_name": student['class_name'],
@@ -89,15 +91,15 @@ async def process_photo(photo: UploadFile = File(...), class_name: str = Form(..
     result_path = None
     
     try:
-        # Sınıf klasörünü oluştur
+        # Create class directory
         class_dir = get_class_photo_dir(class_name)
         
-        # Fotoğrafı geçici olarak kaydet
+        # Save photo temporarily
         temp_path = os.path.join(class_dir, f"temp_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg")
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(photo.file, buffer)
         
-        # Sınıftaki öğrencileri bul
+        # Find students in the class
         students = load_students()
         class_students = {name: data for name, data in students.items() 
                          if data["class_name"] == class_name and data["blur_face"]}
@@ -105,7 +107,7 @@ async def process_photo(photo: UploadFile = File(...), class_name: str = Form(..
         if not class_students:
             raise HTTPException(status_code=400, detail="No students found for this class")
         
-        # Her öğrenci için yüz bulanıklaştırma işlemi
+        # Process face blurring for each student
         result_path = os.path.join(class_dir, f"{class_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg")
         current_path = temp_path
         
@@ -118,20 +120,20 @@ async def process_photo(photo: UploadFile = File(...), class_name: str = Form(..
                 )
                 current_path = result_path
             except Exception as e:
-                # Eğer yüz bulanıklaştırma işlemi başarısız olursa, tüm işlemi iptal et
+                # If face blurring fails, cancel the entire operation
                 raise HTTPException(status_code=500, detail=f"Error processing face for student {student_name}: {str(e)}")
         
-        # URL'yi düzelt
+        # Fix URL
         relative_path = os.path.relpath(result_path, "data")
         
-        # Temp resmi sil
+        # Delete temp file
         if temp_path and os.path.exists(temp_path):
             os.remove(temp_path)
         
         return {"result_path": relative_path}
         
     except Exception as e:
-        # Hata durumunda geçici dosyaları temizle
+        # Clean up temporary files in case of error
         if temp_path and os.path.exists(temp_path):
             os.remove(temp_path)
         if result_path and os.path.exists(result_path):
