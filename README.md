@@ -1,16 +1,16 @@
-# Yüz Tanıma ve Bulanıklaştırma Sistemi
+# Face Recognition and Blurring System
 
-Bu proje, öğrenci fotoğraflarında yüz tanıma ve bulanıklaştırma işlemlerini gerçekleştiren bir web uygulamasıdır.
+This project is a web application that performs face recognition and blurring operations on student photos.
 
-## Özellikler
+## Features
 
-- Öğrenci profil fotoğrafı yükleme
-- Sınıf bazlı öğrenci yönetimi
-- Yüz tanıma ve bulanıklaştırma
-- Sınıf fotoğraflarında otomatik yüz bulanıklaştırma
-- Kullanıcı dostu arayüz
+- Student profile photo upload
+- Class-based student management
+- Face recognition and blurring
+- Automatic face blurring in class photos
+- User-friendly interface
 
-## Teknolojiler
+## Technologies
 
 ### Backend
 
@@ -27,55 +27,55 @@ Bu proje, öğrenci fotoğraflarında yüz tanıma ve bulanıklaştırma işleml
 - Material-UI
 - Axios
 
-## Kurulum
+## Installation
 
-### Backend Kurulumu
+### Backend Setup
 
-1. Python bağımlılıklarını yükleyin:
+1. Install Python dependencies:
 
 ```bash
 cd backend
 pip install -r requirements.txt
 ```
 
-2. Backend sunucusunu başlatın:
+2. Start the backend server:
 
 ```bash
 uvicorn src.api:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### Frontend Kurulumu
+### Frontend Setup
 
-1. Node.js bağımlılıklarını yükleyin:
+1. Install Node.js dependencies:
 
 ```bash
 cd frontend
 npm install
 ```
 
-2. Frontend geliştirme sunucusunu başlatın:
+2. Start the frontend development server:
 
 ```bash
 npm run dev
 ```
 
-## Kullanım
+## Usage
 
-1. Tarayıcınızda `http://localhost:5173` adresine gidin
-2. "Yeni Öğrenci Ekle" bölümünden:
+1. Open `http://localhost:5173` in your browser
+2. From the "Add New Student" section:
 
-   - Öğrenci adı ve sınıf bilgilerini girin
-   - Profil fotoğrafı yükleyin
-   - "Yüzünü Bulanıklaştır" seçeneğini işaretleyin
-   - "Öğrenci Ekle" butonuna tıklayın
+   - Enter student name and class information
+   - Upload profile photo
+   - Check "Blur Face" option
+   - Click "Add Student"
 
-3. "Sınıf Fotoğrafı Yükle" bölümünden:
-   - Sınıf seçin
-   - Sınıf fotoğrafı yükleyin
-   - "Sınıf Fotoğrafı Yükle" butonuna tıklayın
-   - İşlenmiş fotoğrafı görüntüleyin
+3. From the "Upload Class Photo" section:
+   - Select class
+   - Upload class photo
+   - Click "Upload Class Photo"
+   - View the processed photo
 
-## Proje Yapısı
+## Project Structure
 
 ```
 .
@@ -98,25 +98,25 @@ npm run dev
 
 ## API Endpoints
 
-- `POST /api/students`: Yeni öğrenci ekleme
-- `GET /api/students`: Tüm öğrencileri listeleme
-- `POST /api/photos`: Sınıf fotoğrafı işleme
-- `GET /api/classes`: Tüm sınıfları listeleme
+- `POST /api/students`: Add new student
+- `GET /api/students`: List all students
+- `POST /api/photos`: Process class photo
+- `GET /api/classes`: List all classes
 
-## Geliştirme
+## Development
 
-### Backend Geliştirme
+### Backend Development
 
-- `src/api.py`: API endpoint'leri ve iş mantığı
-- `src/face_blur.py`: Yüz tanıma ve bulanıklaştırma işlemleri
-- `data/`: Profil ve sınıf fotoğrafları için depolama alanı
+- `src/api.py`: API endpoints and business logic
+- `src/face_blur.py`: Face recognition and blurring operations
+- `data/`: Storage area for profile and class photos
 
-### Frontend Geliştirme
+### Frontend Development
 
-- `src/App.tsx`: Ana uygulama bileşeni
-- Material-UI bileşenleri ile modern ve responsive tasarım
-- TypeScript ile tip güvenliği
+- `src/App.tsx`: Main application component
+- Modern and responsive design with Material-UI components
+- Type safety with TypeScript
 
-## Lisans
+## License
 
-Bu proje MIT lisansı altında lisanslanmıştır.
+This project is licensed under the MIT License.

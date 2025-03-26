@@ -98,10 +98,10 @@ function App() {
     <Container maxWidth="lg">
       <Box sx={{ my: 4 }}>
         <Typography variant="h4" component="h1" gutterBottom>
-          Yüz Tanıma ve Bulanıklaştırma Sistemi
+          Face Recognition and Blurring System
         </Typography>
 
-        {/* Öğrenci Ekleme ve Profil */}
+        {/* Student Addition and Profile */}
         <Box
           sx={{
             display: "grid",
@@ -113,7 +113,7 @@ function App() {
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                Yeni Öğrenci Ekle
+                Add New Student
               </Typography>
               <form onSubmit={handleAddStudent}>
                 <Box sx={{ display: "grid", gap: 2 }}>
@@ -126,7 +126,7 @@ function App() {
                   >
                     <TextField
                       fullWidth
-                      label="Ad Soyad"
+                      label="Full Name"
                       value={newStudent.name}
                       onChange={(e) =>
                         setNewStudent({ ...newStudent, name: e.target.value })
@@ -135,7 +135,7 @@ function App() {
                     />
                     <TextField
                       fullWidth
-                      label="Sınıf"
+                      label="Class"
                       value={newStudent.class_name}
                       onChange={(e) =>
                         setNewStudent({
@@ -158,14 +158,14 @@ function App() {
                         }
                       />
                     }
-                    label="Yüzünü Bulanıklaştır"
+                    label="Blur Face"
                   />
                   <Button
                     component="label"
                     variant="outlined"
                     startIcon={<CloudUpload />}
                   >
-                    Profil Fotoğrafı Seç
+                    Select Profile Photo
                     <input
                       type="file"
                       hidden
@@ -179,19 +179,19 @@ function App() {
                     startIcon={<PersonAdd />}
                     disabled={!selectedPhoto}
                   >
-                    Öğrenci Ekle
+                    Add Student
                   </Button>
                 </Box>
               </form>
             </CardContent>
           </Card>
 
-          {/* Öğrenci Profili */}
+          {/* Student Profile */}
           {showProfilePhoto && profilePhotoUrl && (
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
-                  Öğrenci Profili
+                  Student Profile
                 </Typography>
                 <Box
                   sx={{
@@ -205,7 +205,7 @@ function App() {
                 >
                   <img
                     src={profilePhotoUrl}
-                    alt="Öğrenci profili"
+                    alt="Student profile"
                     style={{
                       width: "100%",
                       height: "100%",
@@ -218,7 +218,7 @@ function App() {
           )}
         </Box>
 
-        {/* Fotoğraf İşleme ve Sonuç */}
+        {/* Photo Processing and Result */}
         <Box
           sx={{
             display: "grid",
@@ -229,7 +229,7 @@ function App() {
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                Sınıf Fotoğrafı Yükle
+                Upload Class Photo
               </Typography>
               <Box sx={{ display: "grid", gap: 2 }}>
                 <Box
@@ -240,10 +240,10 @@ function App() {
                   }}
                 >
                   <FormControl fullWidth>
-                    <InputLabel>Sınıf Seç</InputLabel>
+                    <InputLabel>Select Class</InputLabel>
                     <Select
                       value={selectedClass}
-                      label="Sınıf Seç"
+                      label="Select Class"
                       onChange={(e) => setSelectedClass(e.target.value)}
                     >
                       {classes.map((cls) => (
@@ -258,7 +258,7 @@ function App() {
                     variant="outlined"
                     startIcon={<PhotoCamera />}
                   >
-                    Sınıf Fotoğrafı Seç
+                    Select Class Photo
                     <input
                       type="file"
                       hidden
@@ -274,22 +274,22 @@ function App() {
                   onClick={handleProcessPhoto}
                   disabled={!selectedPhoto || !selectedClass}
                 >
-                  Sınıf Fotoğrafı Yükle
+                  Upload Class Photo
                 </Button>
               </Box>
             </CardContent>
           </Card>
 
-          {/* İşlenmiş Fotoğraf */}
+          {/* Processed Photo */}
           {resultPhoto && (
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
-                  İşlenmiş Fotoğraf
+                  Processed Photo
                 </Typography>
                 <img
                   src={`http://localhost:8000/api/photos/${resultPhoto}`}
-                  alt="İşlenmiş fotoğraf"
+                  alt="Processed photo"
                   style={{ maxWidth: "100%", height: "auto" }}
                 />
               </CardContent>
