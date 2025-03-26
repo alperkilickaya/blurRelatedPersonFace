@@ -87,55 +87,53 @@ async def get_students():
 
 @app.post("/api/photos")
 async def process_photo(photo: UploadFile = File(...), class_name: str = Form(...)):
-    temp_path = None
     result_path = None
     
     try:
         # Create class directory
         class_dir = get_class_photo_dir(class_name)
         
-        # Save photo temporarily
-        temp_path = os.path.join(class_dir, f"temp_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg")
-        with open(temp_path, "wb") as buffer:
+        # Load students for this class
+        students = load_students()
+        class_students = {name: data for name, data in students.items() if data["class_name"] == class_name}
+        
+        print(f"Processing photo for class: {class_name}")
+        print(f"Found {len(class_students)} students in class")
+        
+        # Process photo for each student
+        any_face_blurred = False
+        
+        # Save the original photo first
+        result_path = os.path.join(class_dir, f"{class_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg")
+        with open(result_path, "wb") as buffer:
             shutil.copyfileobj(photo.file, buffer)
         
-        # Find students in the class
-        students = load_students()
-        class_students = {name: data for name, data in students.items() 
-                         if data["class_name"] == class_name and data["blur_face"]}
-        
-        if not class_students:
-            raise HTTPException(status_code=400, detail="No students found for this class")
-        
-        # Process face blurring for each student
-        result_path = os.path.join(class_dir, f"{class_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg")
-        current_path = temp_path
-        
         for student_name, student_data in class_students.items():
-            try:
-                find_and_blur_face(
-                    current_path,
-                    student_data["photo_path"],
-                    result_path
-                )
-                current_path = result_path
-            except Exception as e:
-                # If face blurring fails, cancel the entire operation
-                raise HTTPException(status_code=500, detail=f"Error processing face for student {student_name}: {str(e)}")
+            if student_data["blur_face"]:
+                print(f"Processing blur for student: {student_name}")
+                print(f"Student photo path: {student_data['photo_path']}")
+                try:
+                    find_and_blur_face(result_path, student_data["photo_path"], result_path)
+                    any_face_blurred = True
+                except Exception as e:
+                    print(f"Error processing face for student {student_name}: {str(e)}")
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"Could not find a matching face for student {student_name}. Please try again with a clearer photo."
+                    )
+            else:
+                print(f"Skipping blur for student: {student_name} (blur_face=False)")
         
-        # Fix URL
-        relative_path = os.path.relpath(result_path, "data")
+        if not any_face_blurred:
+            raise HTTPException(
+                status_code=400,
+                detail="No faces were blurred in the photo. Please try again with a clearer photo."
+            )
         
-        # Delete temp file
-        if temp_path and os.path.exists(temp_path):
-            os.remove(temp_path)
-        
-        return {"result_path": relative_path}
+        return {"result_path": result_path.replace("data/", "")}
         
     except Exception as e:
-        # Clean up temporary files in case of error
-        if temp_path and os.path.exists(temp_path):
-            os.remove(temp_path)
+        # Clean up result file in case of error
         if result_path and os.path.exists(result_path):
             os.remove(result_path)
         raise HTTPException(status_code=500, detail=str(e))

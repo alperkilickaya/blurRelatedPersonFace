@@ -17,6 +17,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import {
   CloudUpload,
@@ -24,7 +26,11 @@ import {
   PhotoCamera,
   Delete,
 } from "@mui/icons-material";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
+
+interface ApiError {
+  detail: string;
+}
 
 interface Student {
   name: string;
@@ -45,6 +51,12 @@ function App() {
   const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
   const [showProfilePhoto, setShowProfilePhoto] = useState(false);
   const [openResetDialog, setOpenResetDialog] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
 
   useEffect(() => {
     fetchClasses();
@@ -94,13 +106,26 @@ function App() {
     formData.append("class_name", selectedClass);
 
     try {
+      setError(null); // Clear any previous errors
       const response = await axios.post(
         "http://localhost:8000/api/photos",
         formData
       );
       setResultPhoto(response.data.result_path);
+      setSnackbarMessage("Photo processed successfully!");
+      setSnackbarSeverity("success");
+      setOpenSnackbar(true);
     } catch (error) {
       console.error("Error processing photo:", error);
+      const axiosError = error as AxiosError<ApiError>;
+      const errorMessage =
+        axiosError.response?.data?.detail ||
+        "An error occurred while processing the photo.";
+      setError(errorMessage);
+      setSnackbarMessage(errorMessage);
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
+      setResultPhoto(null);
     }
   };
 
@@ -118,6 +143,10 @@ function App() {
     } catch (error) {
       console.error("Error resetting data:", error);
     }
+  };
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
   };
 
   return (
@@ -340,6 +369,11 @@ function App() {
                 >
                   Upload Class Photo
                 </Button>
+                {error && (
+                  <Typography color="error" sx={{ mt: 1 }}>
+                    {error}
+                  </Typography>
+                )}
               </Box>
             </CardContent>
           </Card>
@@ -354,12 +388,27 @@ function App() {
                 <img
                   src={`http://localhost:8000/api/photos/${resultPhoto}`}
                   alt="Processed photo"
-                  style={{ maxWidth: "100%", height: "auto" }}
+                  style={{ maxWidth: 450, height: "auto" }}
                 />
               </CardContent>
             </Card>
           )}
         </Box>
+
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={6000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        >
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity={snackbarSeverity}
+            sx={{ width: "100%" }}
+          >
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
       </Box>
     </Container>
   );
