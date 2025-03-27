@@ -1,14 +1,14 @@
-# Face Recognition and Blurring System
+# Face Recognition App
 
-This project is a web application that performs face recognition and blurring operations on student photos.
+This application is a web application developed to manage student photos and perform face blurring operations on class photos.
 
 ## Features
 
 - Student profile photo upload
-- Class-based student management
+- Class photo upload and processing
 - Face recognition and blurring
-- Automatic face blurring in class photos
-- User-friendly interface
+- Class-based student management
+- Reset all data functionality
 
 ## Technologies
 
@@ -16,107 +16,128 @@ This project is a web application that performs face recognition and blurring op
 
 - Python 3.8+
 - FastAPI
-- OpenCV
 - face_recognition
+- OpenCV
 - NumPy
 
 ### Frontend
 
 - React
 - TypeScript
-- Material-UI
-- Axios
-
-## Installation
-
-### Backend Setup
-
-1. Install Python dependencies:
-
-```bash
-cd backend
-pip install -r requirements.txt
-```
-
-2. Start the backend server:
-
-```bash
-uvicorn src.api:app --reload --host 0.0.0.0 --port 8000
-```
-
-### Frontend Setup
-
-1. Install Node.js dependencies:
-
-```bash
-cd frontend
-npm install
-```
-
-2. Start the frontend development server:
-
-```bash
-npm run dev
-```
-
-## Usage
-
-1. Open `http://localhost:5173` in your browser
-2. From the "Add New Student" section:
-
-   - Enter student name and class information
-   - Upload profile photo
-   - Check "Blur Face" option
-   - Click "Add Student"
-
-3. From the "Upload Class Photo" section:
-   - Select class
-   - Upload class photo
-   - Click "Upload Class Photo"
-   - View the processed photo
+- Tailwind CSS
+- Vite
 
 ## Project Structure
 
 ```
 .
 ├── backend/
-│   ├── src/
-│   │   ├── api.py
-│   │   ├── face_blur.py
-│   │   └── __init__.py
+│   ├── app/
+│   │   ├── models/         # Data models
+│   │   ├── schemas/        # Pydantic schemas
+│   │   ├── controllers/    # Business logic
+│   │   ├── routers/        # API endpoints
+│   │   ├── services/       # Service layer
+│   │   └── main.py         # Main application
 │   ├── data/
-│   │   ├── profile_photos/
-│   │   └── class_photos/
+│   │   ├── profile_photos/ # Student profile photos
+│   │   └── class_photos/   # Class photos
 │   └── requirements.txt
 └── frontend/
-    ├── src/
-    │   ├── App.tsx
-    │   └── main.tsx
-    ├── package.json
-    └── tsconfig.json
+    └── src/
+        ├── components/     # React components
+        ├── services/       # API services
+        ├── hooks/         # Custom React hooks
+        ├── types/         # TypeScript types
+        ├── utils/         # Helper functions
+        ├── assets/        # Static files
+        └── contexts/      # React contexts
+```
+
+## Installation
+
+### Backend
+
+1. Create and activate Python virtual environment:
+
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# or
+.\venv\Scripts\activate  # Windows
+```
+
+2. Install required packages:
+
+```bash
+pip install -r requirements.txt
+```
+
+3. Start the application:
+
+```bash
+cd backend
+uvicorn app.main:app --reload
+```
+
+### Frontend
+
+1. Install dependencies:
+
+```bash
+cd frontend
+npm install
+```
+
+2. Start development server:
+
+```bash
+npm run dev
 ```
 
 ## API Endpoints
 
-- `POST /api/students`: Add new student
-- `GET /api/students`: List all students
-- `POST /api/photos`: Process class photo
-- `GET /api/classes`: List all classes
+- `POST /api/student/add-student`: Add new student
+- `GET /api/student/get-students`: List all students
+- `GET /api/student/get-classes`: List all classes
+- `POST /api/student/process-photo`: Process class photo
+- `POST /api/student/reset-data`: Reset all data
+
+## Usage
+
+1. Adding a Student:
+
+   - Enter student name and class information
+   - Upload profile photo
+   - Click "Add Student" button
+
+2. Processing Class Photo:
+
+   - Select class
+   - Upload class photo
+   - Click "Process Photo" button
+   - Download processed photo
+
+3. Resetting Data:
+   - Click "Reset All Data" button
+   - Select "Confirm" in the confirmation dialog
 
 ## Development
 
 ### Backend Development
 
-- `src/api.py`: API endpoints and business logic
-- `src/face_blur.py`: Face recognition and blurring operations
-- `data/`: Storage area for profile and class photos
+- Creating API endpoints with FastAPI
+- Face recognition and blurring operations
+- Data management and storage
 
 ### Frontend Development
 
-- `src/App.tsx`: Main application component
-- Modern and responsive design with Material-UI components
+- Creating React components
 - Type safety with TypeScript
+- API integration
+- User interface design
 
 ## License
 
-This project is licensed under the MIT License.
+MIT

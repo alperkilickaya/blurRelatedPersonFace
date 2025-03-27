@@ -64,7 +64,7 @@ function App() {
 
   const fetchClasses = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/classes");
+      const response = await axios.get("http://localhost:8000/api/get-classes");
       setClasses(response.data);
     } catch (error) {
       console.error("Error fetching classes:", error);
@@ -78,7 +78,7 @@ function App() {
     formData.append("photo", selectedPhoto as File);
 
     try {
-      await axios.post("http://localhost:8000/api/students", formData);
+      await axios.post("http://localhost:8000/api/add-student", formData);
       setNewStudent({ name: "", class_name: "", blur_face: true });
       setSelectedPhoto(null);
       setProfilePhotoUrl(null);
@@ -108,7 +108,7 @@ function App() {
     try {
       setError(null); // Clear any previous errors
       const response = await axios.post(
-        "http://localhost:8000/api/photos",
+        "http://localhost:8000/api/process-photo",
         formData
       );
       setResultPhoto(response.data.result_path);
@@ -131,7 +131,7 @@ function App() {
 
   const handleReset = async () => {
     try {
-      await axios.post("http://localhost:8000/api/reset");
+      await axios.post("http://localhost:8000/api/reset-data");
       setClasses([]);
       setNewStudent({ name: "", class_name: "", blur_face: true });
       setSelectedClass("");
