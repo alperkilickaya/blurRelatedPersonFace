@@ -26,16 +26,12 @@ import {
   PhotoCamera,
   Delete,
 } from "@mui/icons-material";
-import axios, { AxiosError } from "axios";
+import { studentService } from "./services/api";
+import { Student, StudentResponse } from "./types/student";
+import { AxiosError } from "axios";
 
 interface ApiError {
   detail: string;
-}
-
-interface Student {
-  name: string;
-  class_name: string;
-  blur_face: boolean;
 }
 
 function App() {
@@ -43,6 +39,7 @@ function App() {
   const [newStudent, setNewStudent] = useState<Student>({
     name: "",
     class_name: "",
+    photo_path: "",
     blur_face: true,
   });
   const [selectedClass, setSelectedClass] = useState("");
@@ -64,28 +61,42 @@ function App() {
 
   const fetchClasses = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/get-classes");
-      setClasses(response.data);
+      const data = await studentService.getClasses();
+      setClasses(data);
     } catch (error) {
       console.error("Error fetching classes:", error);
+      setError("Failed to fetch classes");
+      setSnackbarMessage("Failed to fetch classes");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
     }
   };
 
   const handleAddStudent = async (e: React.FormEvent) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("student_data", JSON.stringify(newStudent));
-    formData.append("photo", selectedPhoto as File);
+    if (!selectedPhoto) return;
 
     try {
-      await axios.post("http://localhost:8000/api/add-student", formData);
-      setNewStudent({ name: "", class_name: "", blur_face: true });
+      await studentService.addStudent(newStudent, selectedPhoto);
+      setNewStudent({
+        name: "",
+        class_name: "",
+        photo_path: "",
+        blur_face: true,
+      });
       setSelectedPhoto(null);
       setProfilePhotoUrl(null);
       setShowProfilePhoto(false);
       fetchClasses();
+      setSnackbarMessage("Student added successfully");
+      setSnackbarSeverity("success");
+      setOpenSnackbar(true);
     } catch (error) {
       console.error("Error adding student:", error);
+      setError("Failed to add student");
+      setSnackbarMessage("Failed to add student");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
     }
   };
 
@@ -101,17 +112,13 @@ function App() {
   const handleProcessPhoto = async () => {
     if (!selectedPhoto || !selectedClass) return;
 
-    const formData = new FormData();
-    formData.append("photo", selectedPhoto);
-    formData.append("class_name", selectedClass);
-
     try {
-      setError(null); // Clear any previous errors
-      const response = await axios.post(
-        "http://localhost:8000/api/process-photo",
-        formData
+      setError(null);
+      const response: StudentResponse = await studentService.processPhoto(
+        selectedPhoto,
+        selectedClass
       );
-      setResultPhoto(response.data.result_path);
+      setResultPhoto(response.result_path || null);
       setSnackbarMessage("Photo processed successfully!");
       setSnackbarSeverity("success");
       setOpenSnackbar(true);
@@ -131,9 +138,14 @@ function App() {
 
   const handleReset = async () => {
     try {
-      await axios.post("http://localhost:8000/api/reset-data");
+      await studentService.resetData();
       setClasses([]);
-      setNewStudent({ name: "", class_name: "", blur_face: true });
+      setNewStudent({
+        name: "",
+        class_name: "",
+        photo_path: "",
+        blur_face: true,
+      });
       setSelectedClass("");
       setSelectedPhoto(null);
       setResultPhoto(null);

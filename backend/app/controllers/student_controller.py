@@ -22,14 +22,14 @@ class StudentController:
             with open(photo_path, "wb") as buffer:
                 shutil.copyfileobj(photo.file, buffer)
             
-            # Save student information
-            students = self.student_service.load_students()
-            students[student.name] = {
-                "class_name": student.class_name,
-                "photo_path": photo_path,
-                "blur_face": student.blur_face
-            }
-            self.student_service.save_students(students)
+            # Save student information directly
+            self.student_service.save_students({
+                student.name: {
+                    "class_name": student.class_name,
+                    "photo_path": photo_path,
+                    "blur_face": student.blur_face
+                }
+            })
             
             return {"message": "Student added successfully"}
         except Exception as e:

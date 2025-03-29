@@ -9,6 +9,7 @@ This application is a web application developed to manage student photos and per
 - Face recognition and blurring
 - Class-based student management
 - Reset all data functionality
+- Supabase integration for data storage
 
 ## Technologies
 
@@ -19,12 +20,14 @@ This application is a web application developed to manage student photos and per
 - face_recognition
 - OpenCV
 - NumPy
+- Supabase
+- python-dotenv
 
 ### Frontend
 
 - React
 - TypeScript
-- Tailwind CSS
+- Material-UI
 - Vite
 
 ## Project Structure
@@ -42,6 +45,7 @@ This application is a web application developed to manage student photos and per
 │   ├── data/
 │   │   ├── profile_photos/ # Student profile photos
 │   │   └── class_photos/   # Class photos
+│   ├── .env               # Environment variables
 │   └── requirements.txt
 └── frontend/
     └── src/
@@ -74,7 +78,16 @@ source venv/bin/activate  # Linux/Mac
 pip install -r requirements.txt
 ```
 
-3. Start the application:
+3. Set up environment variables:
+   Create a `.env` file in the backend directory with the following variables:
+
+   ```
+   SUPABASE_URL=your_project_url
+   SUPABASE_ANON_KEY=your_anon_key
+   SUPABASE_SERVICE_KEY=your_service_key
+   ```
+
+4. Start the application:
 
 ```bash
 cd backend
@@ -103,6 +116,7 @@ npm run dev
 - `GET /api/student/get-classes`: List all classes
 - `POST /api/student/process-photo`: Process class photo
 - `POST /api/student/reset-data`: Reset all data
+- `GET /api/student/test-connection`: Test Supabase connection
 
 ## Usage
 
@@ -117,7 +131,7 @@ npm run dev
    - Select class
    - Upload class photo
    - Click "Process Photo" button
-   - Download processed photo
+   - View processed photo
 
 3. Resetting Data:
    - Click "Reset All Data" button
@@ -129,11 +143,12 @@ npm run dev
 
 - Creating API endpoints with FastAPI
 - Face recognition and blurring operations
-- Data management and storage
+- Data management with Supabase
+- Environment variable management
 
 ### Frontend Development
 
-- Creating React components
+- Creating React components with Material-UI
 - Type safety with TypeScript
 - API integration
 - User interface design

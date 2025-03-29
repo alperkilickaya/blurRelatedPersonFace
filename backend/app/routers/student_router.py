@@ -3,7 +3,7 @@ import json
 from ..controllers.student_controller import StudentController
 from ..models.student import Student
 
-router = APIRouter()
+router = APIRouter(prefix="/student")
 controller = StudentController()
 
 @router.post("/add-student")
@@ -28,4 +28,8 @@ async def process_photo(photo: UploadFile = File(...), class_name: str = Form(..
 
 @router.post("/reset-data")
 async def reset_data():
-    return controller.reset_data() 
+    return controller.reset_data()
+
+@router.get("/test-connection")
+async def test_connection():
+    return {"connected": controller.student_service.test_connection()} 
